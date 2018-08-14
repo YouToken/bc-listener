@@ -12,16 +12,18 @@ class Listener extends EventEmitter {
     if (this.id) s += `:${this.id}`;
     this.logger[level](`${s} ${msg}`);
   }
-  constructor(provider, storage, config) {
+  constructor(config) {
     super();
+    required('config', config);
+    required('config.provider', config.provider);
+    required('config.storage' , config.storage);
+
     this.logger = config.logger ? config.logger : defaults.logger;
     this.logger.debug('creating listener');
-    required('provider', provider);
-    required('storage' , storage);
 
-    let currency = provider.getCurrency();
-    getter(this, 'provider', _.defaults(provider, defaults.provider(currency)));
-    getter(this, 'storage' , _.defaults(storage, defaults.storage(currency)));
+    let currency = config.provider.getCurrency();
+    getter(this, 'provider', _.defaults(config.provider, defaults.provider(currency)));
+    getter(this, 'storage' , _.defaults(config.storage, defaults.storage(currency)));
     getter(this, 'config'  , parseConfig(_.defaults(config, defaults.config)));
 
     getter(this, 'id', _.uniqueId(`${currency}_`));
