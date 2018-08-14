@@ -1,0 +1,27 @@
+{
+  "name": "bc-listener",
+  "version": "1.0.0",
+  "description": "BlockChain listener",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/YouToken/bc-listener.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/YouToken/bc-listener/issues"
+  },
+  "homepage": "https://github.com/YouToken/bc-listener#readme",
+  "dependencies": {
+    "bignumber.js": "^7.2.1",
+    "bitcoin-core": "^2.0.0",
+    "lodash": "^4.17.10",
+    "moment": "^2.22.2",
+    "ripple-lib": "^1.0.0-beta.5",
+    "superagent": "^3.8.3"
+  }
+}
