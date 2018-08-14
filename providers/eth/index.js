@@ -9,7 +9,7 @@ module.exports = class ETH {
     this.client = rpcClient(conf.url, conf.logger ? conf.logger : logger);
   }
 
-  async getCurrency() {
+  getCurrency() {
     return this.currency
   }
 

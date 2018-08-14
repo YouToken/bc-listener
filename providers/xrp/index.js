@@ -10,7 +10,7 @@ module.exports = class XRP {
     this.HOT = conf.hot;
   }
 
-  async getCurrency() {
+  getCurrency() {
     return this.currency
   }
 
