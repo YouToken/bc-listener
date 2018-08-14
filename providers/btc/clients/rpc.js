@@ -2,9 +2,9 @@
 
 const BitcoinClient = require('bitcoin-core');
 const url = require('url');
-const {logger} = require('../../../logging/logger');
+const {logger} = require('../../../defaults');
 
-module.exports = (addr, timeout = 30 * 1000) => {
+module.exports = (addr, timeout = 30 * 1000, logger = logger) => {
   let url_obj = url.parse(addr);
   let client = new BitcoinClient({
     host: url_obj.hostname,

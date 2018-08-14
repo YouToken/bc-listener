@@ -1,7 +1,7 @@
 'use strict';
-const {logger} = require('../../../logging/logger');
+const logger = require('./logger');
 
-module.exports = (currency='') => {
+module.exports = (currency='', logger = logger) => {
   return {
     async saveHeight(height) {logger.warn(`[${currency}] cannot save height, method is not specified`)},
     async loadHeight() {logger.warn(`[${currency}] cannot load height, method is not specified`); return 0},

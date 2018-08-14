@@ -1,7 +1,7 @@
 const RippleAPI = require('ripple-lib').RippleAPI;
-const {logger} = require('../../../logging/logger');
+const {logger} = require('../../../defaults');
 
-module.exports = addr => {
+module.exports = (addr, logger = logger) => {
 
   function log(level, msg) {
     logger[level](`listener:xrp ${msg}`);

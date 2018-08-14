@@ -5,7 +5,7 @@ const wssClient = require('./clients/wss');
 module.exports = class XRP {
   constructor(conf) {
     this.currency = conf.currency ? conf.currency : 'xrp';
-    this.client = wssClient(conf.url);
+    this.client = wssClient(conf.url, conf.logger);
     this.HOT = conf.hot;
   }
 

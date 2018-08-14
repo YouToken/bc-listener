@@ -5,7 +5,7 @@ const rpcClient = require('./clients/rpc');
 module.exports = class BTC {
   constructor(conf) {
     this.currency = conf.currency ? conf.currency : 'btc';
-    this.client = rpcClient(conf.url);
+    this.client = rpcClient(conf.url, conf.logger);
   }
 
   async getCurrency() {
