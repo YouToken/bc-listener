@@ -22,9 +22,10 @@ class Listener extends EventEmitter {
     this.logger.debug('creating listener');
 
     let currency = config.provider.getCurrency();
+    let settings = _.pick(config, _.keys(defaults.config));
     getter(this, 'provider', _.defaults(config.provider, defaults.provider(currency)));
     getter(this, 'storage' , _.defaults(config.storage, defaults.storage(currency, this.logger)));
-    getter(this, 'config'  , parseConfig(_.defaults(config, defaults.config)));
+    getter(this, 'config'  , parseConfig(_.defaults(settings, defaults.config)));
 
     getter(this, 'id', _.uniqueId(`${currency}_`));
 
