@@ -1,7 +1,7 @@
 'use strict';
 
 const rpcClient = require('./clients/rpc');
-const {logger} = require('../../../defaults');
+const {logger} = require('../../defaults');
 
 module.exports = class ETH {
   constructor(conf) {

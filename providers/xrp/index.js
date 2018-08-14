@@ -1,7 +1,7 @@
 'use strict';
 
 const wssClient = require('./clients/wss');
-const {logger} = require('../../../defaults');
+const {logger} = require('../../defaults');
 
 module.exports = class XRP {
   constructor(conf) {
