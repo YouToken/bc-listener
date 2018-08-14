@@ -3,9 +3,8 @@
 const Web3 = require('web3');
 const util = require('util');
 const BigNumber = require('bignumber.js');
-const {logger} = require('../../../defaults');
 
-module.exports = (addr, logger = logger) => {
+module.exports = (addr, logger) => {
   let web3 = new Web3(new Web3.providers.HttpProvider(addr));
   let eth = new Proxy(web3.eth, {
     get(target, property) {

@@ -1,11 +1,12 @@
 'use strict';
 
 const rpcClient = require('./clients/rpc');
+const {logger} = require('../../../defaults');
 
 module.exports = class ETH {
   constructor(conf) {
     this.currency = conf.currency ? conf.currency : 'eth';
-    this.client = rpcClient(conf.url, conf.logger);
+    this.client = rpcClient(conf.url, conf.logger ? conf.logger : logger);
   }
 
   async getCurrency() {
