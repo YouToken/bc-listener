@@ -54,7 +54,17 @@ module.exports = (addr, timeout = 30 * 1000, logger) => {
     },
     async getBlock(height) {
       let hash = await this.cmd('getblockhash', height);
-      let block = await this.cmd('getblock', hash);
+      // use verbosity = 2 to get transactions in JSON format
+      let block = await this.cmd('getblock', hash, 2);
+      if (block.tx) {
+        // extend each transaction to make it like a result of 'getrawtransaction'
+        block.tx.forEach(function (tx) {
+          tx.blockhash = block.hash;
+          tx.confirmations = block.confirmations;
+          tx.time = block.time;
+          tx.blocktime = block.time;
+        });
+      }
       return {
         height: block.height,
         hash: block.hash,
