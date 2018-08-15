@@ -3,7 +3,9 @@
 module.exports = new Proxy({}, {
   get(target, method) {
     return function (...args) {
-      console.log(`[${method.toUpperCase()}] ${JSON.stringify(args)}`);
+      if (typeof method === 'string') {
+        console.log(`[${method.toUpperCase()}] ${JSON.stringify(args)}`);
+      }
     }
   }
 });
