@@ -101,9 +101,11 @@ class Listener extends EventEmitter {
     await this.storage.clearUnconfirmed('pool');
     let pool = await this.provider.getPool();
     for (let i = 0; i < pool.length; i++) {
-      pool[i] = await this.provider.proceedTransaction(pool[i]);
+      pool[i] = {
+        original: pool[i],
+        processed: await this.provider.proceedTransaction(pool[i])
+      };
     }
-    pool = _.flatten(pool);
     await this.storage.saveUnconfirmed('pool', pool);
     this.emit('from_pool', pool);
     this.log('debug', 'proceeding pool finished');
@@ -124,9 +126,11 @@ class Listener extends EventEmitter {
       this.log('info', `worker proceed block #${i}`);
       let block = await this.provider.getBlock(i);
       for (let j = 0; j < block.txs.length; j++) {
-        block.txs[j] = await this.provider.proceedTransaction(block.txs[j]);
+        block.txs[j] = {
+          original: block.txs[j],
+          processed: await this.provider.proceedTransaction(block.txs[j])
+        };
       }
-      block.txs = _.flatten(block.txs);
       try {
         chain.push(block);
       } catch (e) {
