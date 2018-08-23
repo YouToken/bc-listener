@@ -64,17 +64,23 @@ class Listener extends EventEmitter {
   }
   isPlaying() {return !!this.timer}
   async play() {
-    await this.worker('saved', 'latest', true, this.mainChain);
-    await this.proceedPool();
+    await this._tick();
     let self = this;
 
     self.timer = setTimeout(async function timer() {
-      await self.worker('saved', 'latest', true, self.mainChain);
-      await self.proceedPool();
+      await self._tick();
       self.timer = setTimeout(timer, self.config.update_interval);
     }, self.config.update_interval);
     this.emit('play');
     this.log('info', 'listener played');
+  }
+  async _tick() {
+    try {
+      await this.worker('saved', 'latest', true, this.mainChain);
+      await this.proceedPool();
+    } catch (e) {
+      this.log('error', e);
+    }
   }
   async pause() {
     if (this.timer) clearInterval(this.timer);
