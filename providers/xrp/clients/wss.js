@@ -1,6 +1,6 @@
 const RippleAPI = require('ripple-lib').RippleAPI;
 
-module.exports = (addr, logger) => {
+module.exports = (addr, delay, logger) => {
 
   function log(level, msg) {
     logger[level](`listener:xrp ${msg}`);
@@ -12,7 +12,7 @@ module.exports = (addr, logger) => {
   }
 
   async function sleep() {
-    return new Promise(resolve => setTimeout(resolve, 1000));
+    return new Promise(resolve => setTimeout(resolve, delay));
   }
 
   const api = new RippleAPI({
