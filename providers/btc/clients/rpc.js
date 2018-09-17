@@ -54,16 +54,34 @@ module.exports = (addr, timeout = 30 * 1000, logger) => {
     },
     async getBlock(height) {
       let hash = await this.cmd('getblockhash', height);
-      // use verbosity = 2 to get transactions in JSON format
-      let block = await this.cmd('getblock', hash, 2);
-      if (block.tx) {
-        // extend each transaction to make it like a result of 'getrawtransaction'
-        block.tx.forEach(function (tx) {
-          tx.blockhash = block.hash;
-          tx.confirmations = block.confirmations;
-          tx.time = block.time;
-          tx.blocktime = block.time;
-        });
+      let block;
+      try {
+        // use verbosity = 2 to get transactions in JSON format
+        block = await this.cmd('getblock', hash, 2);
+        if (block.tx) {
+          // extend each transaction to make it like a result of 'getrawtransaction'
+          block.tx.forEach(function (tx) {
+            tx.blockhash = block.hash;
+            tx.confirmations = block.confirmations;
+            tx.time = block.time;
+            tx.blocktime = block.time;
+          });
+        }
+      } catch (e) {
+        block = await this.cmd('getblock', hash, true);
+        if (block.tx) {
+          let txs = [];
+          block.tx.forEach(async function (txid) {
+            txs.push({
+              txid,
+              blockhash: block.hash,
+              confirmations: block.confirmations,
+              time: block.time,
+              blocktime: block.time
+            });
+          });
+          block.tx = txs;
+        }
       }
       return {
         height: block.height,
