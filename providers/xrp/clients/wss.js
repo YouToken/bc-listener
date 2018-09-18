@@ -6,6 +6,10 @@ module.exports = (addr, delay, logger) => {
     logger[level](`listener:xrp ${msg}`);
   }
 
+  function shouldReconnect(e) {
+    return e.name && (e.name === 'TimeoutError' || e.name === 'DisconnectedError');
+  }
+
   function shouldRetryRequest(e) {
     return !(e.message && (e.message === 'lgrNotFound' || e.message === 'lgrIdxsInvalid'))
       && !(e.name && e.name === 'ValidationError');
@@ -48,6 +52,13 @@ module.exports = (addr, delay, logger) => {
           return await api[method](...args);
         } catch (e) {
           logger.error(e);
+          if (shouldReconnect(e)) {
+            try {
+              await api.reconnect();
+            } catch (e) {
+              logger.error(e);
+            }
+          }
           if (shouldRetryRequest(e)) {
             log('info', `RETRYING ${method}`);
             await sleep();
