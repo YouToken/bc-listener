@@ -54,7 +54,8 @@ module.exports = (addr, delay, logger) => {
           logger.error(e);
           if (shouldReconnect(e)) {
             try {
-              await api.reconnect();
+              await api.disconnect();
+              await api.connect();
             } catch (e) {
               logger.error(e);
             }
