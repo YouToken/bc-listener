@@ -141,6 +141,7 @@ class Listener extends EventEmitter {
         chain.push(block);
       } catch (e) {
         if (e.message !== 'parent not found') throw e;
+        this.log('error', e);
         i -= 2;
       }
     }
