@@ -11,7 +11,7 @@ module.exports = (addr, delay, logger) => {
   }
 
   function shouldRetryRequest(e) {
-    return !(e.message && (e.message === 'lgrNotFound' || e.message === 'lgrIdxsInvalid'))
+    return !(e.message && (e.message === 'lgrNotFound' || e.message === 'lgrIdxsInvalid' || e.message === 'actNotFound'))
       && !(e.name && e.name === 'ValidationError');
   }
 
