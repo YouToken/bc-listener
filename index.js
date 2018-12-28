@@ -79,7 +79,7 @@ class Listener extends EventEmitter {
       await this.worker('saved', 'latest', true, this.mainChain);
       await this.proceedPool();
     } catch (e) {
-      this.log('error', e);
+      this.logger.error(e);
     }
   }
   async pause() {
@@ -141,7 +141,7 @@ class Listener extends EventEmitter {
         chain.push(block);
       } catch (e) {
         if (e.message !== 'parent not found') throw e;
-        this.log('error', e);
+        this.logger.error(e);
         i -= 2;
       }
     }
