@@ -6,6 +6,15 @@ const BigNumber = require('bignumber.js');
 
 module.exports = (addr, logger) => {
   let web3 = new Web3(new Web3.providers.HttpProvider(addr));
+  web3.extend({
+    property: 'trace',
+    methods: [{
+      name: 'traceTransaction',
+      call: 'trace_transaction',
+      params: 1
+    }]
+  });
+
   let eth = new Proxy(web3.eth, {
     get(target, property) {
       if (util.isFunction(target[property])) {
