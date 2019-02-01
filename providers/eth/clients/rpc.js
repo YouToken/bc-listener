@@ -1,8 +1,33 @@
 'use strict';
 
 const Web3 = require('web3');
+const formatter = require('web3-core-helpers').formatters;
+const web3Utils = require('web3-utils');
 const util = require('util');
 const BigNumber = require('bignumber.js');
+
+const traceTransactionFormatter = function (tx) {
+  if (tx.action) {
+    tx.action.gas = formatter.outputBigNumberFormatter(tx.action.gas);
+    tx.action.value = formatter.outputBigNumberFormatter(tx.action.value);
+
+    if (tx.action.to && web3Utils.isAddress(tx.action.to)) { // tx.to could be `0x0` or `null` while contract creation
+      tx.action.to = web3Utils.toChecksumAddress(tx.action.to);
+    } else {
+      tx.action.to = null; // set to `null` if invalid address
+    }
+
+    if (tx.action.from) {
+      tx.action.from = web3Utils.toChecksumAddress(tx.action.from);
+    }
+  }
+
+  if (tx.result) {
+    tx.result.gasUsed = formatter.outputBigNumberFormatter(tx.result.gasUsed);
+  }
+
+  return tx;
+};
 
 module.exports = (addr, logger) => {
   let web3 = new Web3(new Web3.providers.HttpProvider(addr));
@@ -11,7 +36,9 @@ module.exports = (addr, logger) => {
     methods: [{
       name: 'traceTransaction',
       call: 'trace_transaction',
-      params: 1
+      params: 1,
+      inputFormatter: [null],
+      outputFormatter: traceTransactionFormatter
     }]
   });
 
