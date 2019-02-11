@@ -8,8 +8,8 @@ const BigNumber = require('bignumber.js');
 
 const traceTransactionFormatter = function (tx) {
   if (tx.action) {
-    tx.action.gas = formatter.outputBigNumberFormatter(tx.action.gas);
-    tx.action.value = formatter.outputBigNumberFormatter(tx.action.value);
+    tx.action.gas = tx.action.gas ? formatter.outputBigNumberFormatter(tx.action.gas) : '0';
+    tx.action.value = tx.action.value ? formatter.outputBigNumberFormatter(tx.action.value) : '0';
 
     if (tx.action.to && web3Utils.isAddress(tx.action.to)) { // tx.to could be `0x0` or `null` while contract creation
       tx.action.to = web3Utils.toChecksumAddress(tx.action.to);
@@ -23,7 +23,7 @@ const traceTransactionFormatter = function (tx) {
   }
 
   if (tx.result) {
-    tx.result.gasUsed = formatter.outputBigNumberFormatter(tx.result.gasUsed);
+    tx.result.gasUsed = tx.result.gasUsed ? formatter.outputBigNumberFormatter(tx.result.gasUsed) : '0';
   }
 
   return tx;
