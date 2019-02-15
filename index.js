@@ -141,8 +141,10 @@ class Listener extends EventEmitter {
         chain.push(block);
       } catch (e) {
         if (e.message !== 'parent not found') throw e;
-        this.logger.error(e);
-        i -= 2;
+        // it is probably a blockchain fork, rescan last blocks
+        this.logger.warn(e);
+        chain.clear();
+        i -= this.config.confirmations + 1;
       }
     }
     if (update_height) {
