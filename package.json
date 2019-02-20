@@ -22,6 +22,7 @@
     "lodash": "^4.17.10",
     "moment": "^2.22.2",
     "ripple-lib": "^1.0.0",
+    "stellar-sdk": "^0.13.0",
     "superagent": "^3.8.3"
   }
 }
