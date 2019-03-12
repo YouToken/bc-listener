@@ -26,10 +26,13 @@ module.exports = (addr, logger) => {
         .ledgers()
         .ledger(height)
         .call();
-      let xlmTxs = await ledger.transactions();
       let txs = [];
-      for (let tx of xlmTxs.records) {
-        txs.push(tx);
+      let page = await ledger.transactions();
+      while (page.records.length) {
+        for (let tx of page.records) {
+          txs.push(tx);
+        }
+        page = await page.next();
       }
       return {
         height: ledger.sequence,
