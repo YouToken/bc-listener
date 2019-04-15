@@ -50,7 +50,7 @@ class Listener extends EventEmitter {
           this.emit('save_unconfirmed', unconfirmedBlocks[i]);
         }
       },
-      confirm: this.confirm,
+      confirm: async confirmedBlocks => await this.confirm(confirmedBlocks),
       isParent(parentBlock, childBlock) {
         return childBlock.prev_hash === parentBlock.hash;
       }
