@@ -12,11 +12,12 @@ class Listener extends EventEmitter {
     if (this.id) s += `:${this.id}`;
     this.logger[level](`${s} ${msg}`);
   }
+
   constructor(config) {
     super();
     required('config', config);
     required('config.provider', config.provider);
-    required('config.storage' , config.storage);
+    required('config.storage', config.storage);
 
     this.logger = config.logger ? config.logger : defaults.logger;
     this.logger.debug('creating listener');
@@ -24,13 +25,14 @@ class Listener extends EventEmitter {
     let currency = config.provider.getCurrency();
     let settings = _.pick(config, _.keys(defaults.config));
     getter(this, 'provider', _.defaults(config.provider, defaults.provider(currency)));
-    getter(this, 'storage' , _.defaults(config.storage, defaults.storage(currency, this.logger)));
-    getter(this, 'config'  , parseConfig(_.defaults(settings, defaults.config)));
+    getter(this, 'storage', _.defaults(config.storage, defaults.storage(currency, this.logger)));
+    getter(this, 'config', parseConfig(_.defaults(settings, defaults.config)));
 
     getter(this, 'id', _.uniqueId(`${currency}_`));
 
     this.log('debug', `listener created with config: ${JSON.stringify(this.config)}`);
   }
+
   makeChain() {
     this.log('debug', 'creating new chain');
     return chain({
@@ -48,21 +50,27 @@ class Listener extends EventEmitter {
           this.emit('save_unconfirmed', unconfirmedBlocks[i]);
         }
       },
-      confirm: async confirmedBlocks => {
-        this.log('debug', `confirm blocks: ${JSON.stringify(confirmedBlocks.map(b => b.hash))}`);
-        for (let i = 0; i < confirmedBlocks.length; i++) {
-          await this.storage.saveTransactions(confirmedBlocks[i].hash, confirmedBlocks[i].txs);
-          await this.storage.clearUnconfirmed(confirmedBlocks[i].hash);
-          this.emit('clear_unconfirmed', confirmedBlocks[i]);
-          this.emit('save_transactions', confirmedBlocks[i]);
-        }
-      },
+      confirm: this.confirm,
       isParent(parentBlock, childBlock) {
         return childBlock.prev_hash === parentBlock.hash;
       }
     }, this.config.confirmations, this.logger);
   }
-  isPlaying() {return !!this.timer}
+
+  async confirm(confirmedBlocks) {
+    this.log('debug', `confirm blocks: ${JSON.stringify(confirmedBlocks.map(b => b.hash))}`);
+    for (let i = 0; i < confirmedBlocks.length; i++) {
+      await this.storage.saveTransactions(confirmedBlocks[i].hash, confirmedBlocks[i].txs);
+      await this.storage.clearUnconfirmed(confirmedBlocks[i].hash);
+      this.emit('clear_unconfirmed', confirmedBlocks[i]);
+      this.emit('save_transactions', confirmedBlocks[i]);
+    }
+  }
+
+  isPlaying() {
+    return !!this.timer
+  }
+
   async play() {
     await this._tick();
     let self = this;
@@ -74,6 +82,7 @@ class Listener extends EventEmitter {
     this.emit('play');
     this.log('info', 'listener played');
   }
+
   async _tick() {
     try {
       await this.worker('saved', 'latest', true, this.mainChain);
@@ -82,19 +91,22 @@ class Listener extends EventEmitter {
       this.logger.error(e);
     }
   }
+
   async pause() {
     if (this.timer) clearInterval(this.timer);
     this.timer = null;
     this.emit('pause');
     this.log('info', 'listener paused');
   }
-  async start(from=this.config.start_height) {
+
+  async start(from = this.config.start_height) {
     this.mainChain = this.makeChain();
     await this.worker(from, 'latest', true, this.mainChain);
     await this.play();
     this.emit('start');
     this.log('info', 'listener started');
   }
+
   async stop() {
     await this.pause();
     this.mainChain.clear();
@@ -102,6 +114,7 @@ class Listener extends EventEmitter {
     this.emit('stop');
     this.log('info', 'listener stopped');
   }
+
   async proceedPool() {
     this.log('debug', 'proceeding pool started');
     await this.storage.clearUnconfirmed('pool');
@@ -116,6 +129,7 @@ class Listener extends EventEmitter {
     this.emit('from_pool', pool);
     this.log('debug', 'proceeding pool finished');
   }
+
   async worker(from, to, update_height, chain) {
     this.log('debug', `worker started: from=${from}, to=${to}, update_height=${update_height}, chain=${chain === this.mainChain ? 'mainChain' : 'custom'}`);
     if (!chain) throw Error(`chain is not specified: ${chain}`);
@@ -131,14 +145,46 @@ class Listener extends EventEmitter {
     for (let i = fromBlock; i <= toBlock; i++) {
       this.log('info', `worker proceed block #${i}`);
       let block = await this.provider.getBlock(i);
+      let standardTxs = [];
+      let instantTxs = [];
       for (let j = 0; j < block.txs.length; j++) {
-        block.txs[j] = {
-          original: block.txs[j],
-          processed: await this.provider.proceedTransaction(block.txs[j])
-        };
+        let processed = await this.provider.proceedTransaction(block.txs[j]);
+        let standard = processed.filter(tx => !tx.instant);
+        if (standard.length) {
+          standardTxs.push({
+            original: block.txs[j],
+            processed: standard
+          });
+        }
+        let instant = processed.filter(tx => tx.instant);
+        if (instant.length) {
+          instantTxs.push({
+            original: block.txs[j],
+            processed: instant
+          });
+        }
       }
+
+      // confirm instant txs
       try {
-        chain.push(block);
+        await this.confirm([{
+          height: block.height,
+          hash: block.hash,
+          prev_hash: block.prev_hash,
+          txs: instantTxs
+        }]);
+      } catch (e) {
+        this.logger.error(e);
+      }
+
+      // send standard txs to the chain
+      try {
+        chain.push({
+          height: block.height,
+          hash: block.hash,
+          prev_hash: block.prev_hash,
+          txs: standardTxs
+        });
       } catch (e) {
         if (e.message !== 'parent not found') throw e;
         // it is probably a blockchain fork, rescan last blocks
@@ -153,7 +199,8 @@ class Listener extends EventEmitter {
     }
     this.log('debug', 'worker finished');
   }
-  async resync(from='saved', to='latest') {
+
+  async resync(from = 'saved', to = 'latest') {
     this.log('info', `resync started: from=${from}, to=${to}`);
     let playing = this.isPlaying();
     if (playing) await this.pause();
@@ -180,12 +227,14 @@ class Listener extends EventEmitter {
 function required(name, val) {
   if (!val) throw new Error(`${name} is not specified`);
 }
+
 function getter(obj, name, value) {
   Object.defineProperty(obj, name, {
     get() {return value},
     set() {throw Error('You cannot change this property');}
   })
 }
+
 function parseConfig(config) {
   let update_interval = config.update_interval;
   if (!_.isString(update_interval) && !_.isNumber(update_interval)) throw new Error(`Invalid update interval: ${this.config.update_interval}`);
