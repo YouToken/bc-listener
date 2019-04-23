@@ -7,9 +7,7 @@ module.exports = (addr, logger) => {
   const rpc = new JsonRpc(addr, {fetch});
 
   return {
-    async cmd(command, ...args) {
-      return new Promise((resolve, reject) => rpc[command](...args, (err, result) => err ? reject(err) : resolve(result)));
-    },
+    rpc,
 
     async getCurrentHeight() {
       let info = await rpc.get_info();
