@@ -11,7 +11,7 @@ module.exports = (addr, logger) => {
 
     async getCurrentHeight() {
       let info = await rpc.get_info();
-      return info.last_irreversible_block_num;
+      return info.head_block_num;
     },
 
     async getPool() {
