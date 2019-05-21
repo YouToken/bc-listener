@@ -3,7 +3,7 @@
 const StellarSdk = require('stellar-sdk');
 
 module.exports = (addr, logger) => {
-  let api = new StellarSdk.Server(addr);
+  let api = new StellarSdk.Server(addr, {allowHttp: true});
 
   return {
     api,
