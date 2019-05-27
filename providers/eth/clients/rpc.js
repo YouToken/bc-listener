@@ -1,13 +1,46 @@
 'use strict';
 
 const Web3 = require('web3');
-const Web3ParityTrace = require('web3-parity-trace');
+const formatter = require('web3-core-helpers').formatters;
+const web3Utils = require('web3-utils');
 const util = require('util');
 const BigNumber = require('bignumber.js');
 
+const traceTransactionFormatter = function (tx) {
+  if (tx.action) {
+    tx.action.gas = tx.action.gas ? formatter.outputBigNumberFormatter(tx.action.gas) : '0';
+    tx.action.value = tx.action.value ? formatter.outputBigNumberFormatter(tx.action.value) : '0';
+
+    if (tx.action.to && web3Utils.isAddress(tx.action.to)) { // tx.to could be `0x0` or `null` while contract creation
+      tx.action.to = web3Utils.toChecksumAddress(tx.action.to);
+    } else {
+      tx.action.to = null; // set to `null` if invalid address
+    }
+
+    if (tx.action.from) {
+      tx.action.from = web3Utils.toChecksumAddress(tx.action.from);
+    }
+  }
+
+  if (tx.result) {
+    tx.result.gasUsed = tx.result.gasUsed ? formatter.outputBigNumberFormatter(tx.result.gasUsed) : '0';
+  }
+
+  return tx;
+};
+
 module.exports = (addr, logger) => {
   let web3 = new Web3(new Web3.providers.HttpProvider(addr));
-  web3.trace = new Web3ParityTrace(web3.currentProvider); // TODO is it a proper way?
+  web3.extend({
+    property: 'trace',
+    methods: [{
+      name: 'traceTransaction',
+      call: 'trace_transaction',
+      params: 1,
+      inputFormatter: [null],
+      outputFormatter: traceTransactionFormatter
+    }]
+  });
 
   let eth = new Proxy(web3.eth, {
     get(target, property) {
