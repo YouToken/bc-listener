@@ -26,7 +26,7 @@
     "ripple-lib": "^1.2.1",
     "stellar-sdk": "^0.15.3",
     "superagent": "^3.8.3",
-    "web3": "^1.0.0-beta.53",
+    "web3": "^1.0.0-beta.36",
     "web3-parity-trace": "^1.0.0"
   }
 }
