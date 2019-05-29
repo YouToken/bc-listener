@@ -63,13 +63,10 @@ module.exports = (addr, logger) => {
         }
         if (command === 'eth_getBlockByNumber') {
           let data = await eth.getBlock(+args[0], true);
-          for (let i = 0; i < data.transactions.length; i++) {
-            let receipt = await this.cmd('eth_getTransactionReceipt', data.transactions[i].hash);
-            Object.assign(data.transactions[i], {
-              receipt,
-              gasPrice: (new BigNumber(data.transactions[i].gasPrice)).toString(10),
-              value: (new BigNumber(data.transactions[i].value)).toString(10)
-            }, {timestamp: data.timestamp});
+          for (let tx of data.transactions) {
+            tx.gasPrice = (new BigNumber(tx.gasPrice)).toString(10);
+            tx.value = (new BigNumber(tx.value)).toString(10);
+            tx.timestamp = data.timestamp;
           }
           return data;
         }
