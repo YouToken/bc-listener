@@ -1,6 +1,6 @@
 {
   "name": "bc-listener",
-  "version": "1.11.1",
+  "version": "1.11.2",
   "description": "BlockChain listener",
   "main": "index.js",
   "scripts": {
