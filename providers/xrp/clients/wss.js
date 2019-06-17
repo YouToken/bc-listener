@@ -60,7 +60,7 @@ module.exports = (addr, delay, logger) => {
               logger.error(e);
             }
           }
-          if (shouldRetryRequest(e)) {
+          if (method !== 'getSettings' && shouldRetryRequest(e)) {
             log('info', `RETRYING ${method}`);
             await sleep();
             return exec(...args);
