@@ -26,6 +26,7 @@ module.exports = class XRP {
         hash: ledger.ledgerHash,
         prev_hash: ledger.parentLedgerHash,
         height,
+        timestamp: new Date(ledger.closeTime),
         txs: txs ? txs : []
       }
     } catch (e) {

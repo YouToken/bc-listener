@@ -44,6 +44,7 @@ module.exports = (addr, timeout = 30 * 1000, logger) => {
         height,
         hash: blockhash,
         prev_hash: block.previousblockhash,
+        timestamp: new Date(+block.time * 1000),
         txs
       }
     }

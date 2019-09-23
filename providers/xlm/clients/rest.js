@@ -38,6 +38,7 @@ module.exports = (addr, logger) => {
         height: ledger.sequence,
         hash: ledger.hash,
         prev_hash: ledger.prev_hash,
+        timestamp: new Date(ledger.closed_at),
         txs
       }
     }

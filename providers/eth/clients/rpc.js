@@ -56,6 +56,7 @@ module.exports = (addr, logger) => {
         hash: data.hash,
         prev_hash: data.parentHash,
         height,
+        timestamp: new Date(+data.timestamp * 1000),
         txs: data.transactions
       }
     }

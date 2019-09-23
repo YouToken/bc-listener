@@ -24,6 +24,7 @@ module.exports = (addr, logger) => {
         height: block.block_num,
         hash: block.id,
         prev_hash: block.previous,
+        timestamp: new Date(block.timestamp),
         txs: block.transactions
           .filter(t => t.status === 'executed')
           .map(t => t.trx)
