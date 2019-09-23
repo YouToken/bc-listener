@@ -101,7 +101,11 @@ class Listener extends EventEmitter {
 
   async start(from = this.config.start_height) {
     this.mainChain = this.makeChain();
-    await this.worker(from, 'latest', true, this.mainChain);
+    try {
+      await this.worker(from, 'latest', true, this.mainChain);
+    } catch (e) {
+      this.logger.error(e);
+    }
     await this.play();
     this.emit('start');
     this.log('info', 'listener started');
