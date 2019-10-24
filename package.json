@@ -4,7 +4,7 @@
   "description": "BlockChain listener",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "postversion": "git push origin master && git push --tags"
   },
   "repository": {
     "type": "git",
