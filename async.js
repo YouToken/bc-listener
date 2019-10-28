@@ -54,7 +54,12 @@ class AsyncListener extends Listener {
       for (let k = i; k < lastBlock; k++) {
         q.add(async () => {
           console.time(`Block #${k}`);
-          puck.push(await this._proceedBlock(k));
+          try {
+            puck.push(await this._proceedBlock(k));
+          } catch (e) {
+            e.message = `BlockProceedError: #${k}, ${e.message}`;
+            this.logger.error(e);
+          }
           console.timeEnd(`Block #${k}`);
         });
       }
@@ -67,7 +72,10 @@ class AsyncListener extends Listener {
         try {
           chain.push(b);
         } catch (e) {
-          if (e.message !== "parent not found") this.logger.error(e);
+          if (e.message !== "parent not found") {
+            this.logger.error(e);
+            continue;
+          }
           // it is probably a blockchain fork, rescan last blocks
           e.message += JSON.stringify(b);
           this.logger.warn(e);
