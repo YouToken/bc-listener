@@ -8,9 +8,10 @@ class AsyncListener extends Listener {
   constructor(config) {
     super(config);
     this.async = _.defaults(config.async, {
-      blocks: 20,
-      txs: 5
-    }); //async proceed 5 blocks and 10 txs in a block
+      blocks: 10,
+      txs: 5,
+      timeout: 5000
+    }); //async proceed 10 blocks and 5 txs in a block and 5 sec timeout for ready
   }
 
   async worker(from, to, update_height, chain) {
@@ -39,7 +40,10 @@ class AsyncListener extends Listener {
       this.emit("save_height", fromBlock);
     }
 
-    const q = new PQueue({ concurrency: this.async.blocks });
+    const q = new PQueue({
+      concurrency: this.async.blocks,
+      timeout: this.async.timeout
+    });
 
     fork: for (let i = fromBlock; i <= toBlock; i += this.async.blocks) {
       console.time(`${this.async.blocks} blocks from ${i}`);
@@ -99,7 +103,10 @@ class AsyncListener extends Listener {
 
     this.log("info", `${block.txs.length} in block ${block.height}`);
 
-    const q = new PQueue({ concurrency: this.async.txs });
+    const q = new PQueue({
+      concurrency: this.async.txs,
+      timeout: this.async.timeout
+    });
 
     for (let j = 0; j < block.txs.length; j += this.async.txs) {
       let instantTxs = [];
