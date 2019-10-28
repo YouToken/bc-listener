@@ -67,7 +67,7 @@ class AsyncListener extends Listener {
         try {
           chain.push(b);
         } catch (e) {
-          if (e.message !== "parent not found") throw e;
+          if (e.message !== "parent not found") this.logger.error(e);
           // it is probably a blockchain fork, rescan last blocks
           e.message += JSON.stringify(b);
           this.logger.warn(e);
