@@ -76,8 +76,7 @@ class AsyncListener extends Listener {
           e.message += JSON.stringify(b);
           this.logger.warn(e);
           chain.clear();
-          i = +b.height - this.config.confirmations + 1;
-          this.log("info", `rollback to ${i} (${b.height} - ${this.config.confirmations})`);
+          i = +b.height - this.async.blocks - this.config.confirmations + 1;
           continue fork;
         }
       }
