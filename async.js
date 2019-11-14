@@ -40,33 +40,29 @@ class AsyncListener extends Listener {
       this.emit("save_height", fromBlock);
     }
 
-    const q = new PQueue({
+    const queue = new PQueue({
       concurrency: this.async.blocks,
       timeout: this.async.timeout
     });
 
     fork: for (let i = fromBlock; i <= toBlock; i += this.async.blocks) {
-      console.time(`${this.async.blocks} blocks from ${i}`);
-
       let puck = [];
       let lastBlock = _.min([i + this.async.blocks, toBlock]);
 
       for (let k = i; k < lastBlock; k++) {
-        q.add(async () => {
-          console.time(`Block #${k}`);
+        queue.add(async () => {
           try {
             puck.push(await this._processBlock(k));
           } catch (e) {
             e.message = `BlockProceedError: #${k}, ${e.message}`;
             this.logger.error(e);
           }
-          console.timeEnd(`Block #${k}`);
         });
       }
 
-      this.log("info", `all, ${lastBlock}`);
-      await q.onIdle();
-      this.log("info", `end, ${lastBlock}`);
+      this.log("info", `queue filled, ${lastBlock}`);
+      await queue.onIdle();
+      this.log("info", `queue finished, ${lastBlock}`);
 
       for (let b of _.sortBy(puck, "height")) {
         try {
@@ -81,6 +77,7 @@ class AsyncListener extends Listener {
           this.logger.warn(e);
           chain.clear();
           i = +b.height - this.config.confirmations + 1;
+          this.log("info", `rollback to ${i} (${b.height} - ${this.config.confirmations})`);
           continue fork;
         }
       }
@@ -89,8 +86,6 @@ class AsyncListener extends Listener {
         await this.storage.saveHeight(lastBlock);
         this.emit("save_height", lastBlock);
       }
-
-      console.timeEnd(`${this.async.blocks} blocks from ${i}`);
     }
     this.log("debug", "worker finished");
   }

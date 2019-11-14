@@ -147,7 +147,7 @@ class Listener extends EventEmitter {
       this.emit('save_height', fromBlock);
     }
     for (let i = fromBlock; i <= toBlock; i++) {
-      this.log('info', `worker proceed block #${i}`);
+      this.log('info', `start processing block ${i}`);
       let block = await this.provider.getBlock(i);
       let standardTxs = [];
       let instantTxs = [];
