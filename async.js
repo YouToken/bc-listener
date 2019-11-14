@@ -55,7 +55,7 @@ class AsyncListener extends Listener {
         q.add(async () => {
           console.time(`Block #${k}`);
           try {
-            puck.push(await this._proceedBlock(k));
+            puck.push(await this._processBlock(k));
           } catch (e) {
             e.message = `BlockProceedError: #${k}, ${e.message}`;
             this.logger.error(e);
@@ -95,23 +95,23 @@ class AsyncListener extends Listener {
     this.log("debug", "worker finished");
   }
 
-  async _proceedBlock(i) {
-    this.log("info", `worker proceed block #${i}`);
+  async _processBlock(i) {
+    this.log("info", `start processing block ${i}`);
 
     let block = await this.provider.getBlock(i);
 
-    let proccededBlock = {
+    let processedBlock = {
       height: block.height,
       hash: block.hash,
       prev_hash: block.prev_hash,
       txs: []
     };
 
-    if (!block.txs.length) return proccededBlock;
+    if (!block.txs.length) return processedBlock;
 
-    this.log("info", `${block.txs.length} in block ${block.height}`);
+    this.log("info", `${block.txs.length} txs in block ${block.height}`);
 
-    const q = new PQueue({
+    const queue = new PQueue({
       concurrency: this.async.txs,
       timeout: this.async.timeout
     });
@@ -122,7 +122,7 @@ class AsyncListener extends Listener {
 
       for (let k = j; k < lastTx; k++) {
         let tx = block.txs[k];
-        q.add(async () => {
+        queue.add(async () => {
           let processed = await this.provider.proceedTransaction(tx, block);
 
           if (!processed.length) return;
@@ -131,7 +131,7 @@ class AsyncListener extends Listener {
           let instant = processed.filter(tx => tx.instant);
 
           standard.length &&
-            proccededBlock.txs.push({
+            processedBlock.txs.push({
               original: tx,
               processed: standard
             });
@@ -143,10 +143,10 @@ class AsyncListener extends Listener {
         });
       }
 
-      await q.onIdle();
+      await queue.onIdle();
 
-      try {
-        if (instantTxs.length) {
+      if (instantTxs.length) {
+        try {
           this.confirm([
             {
               height: block.height,
@@ -155,13 +155,13 @@ class AsyncListener extends Listener {
               txs: instantTxs
             }
           ]);
+        } catch (e) {
+          this.logger.error(e);
         }
-      } catch (e) {
-        this.logger.error(e);
       }
     }
 
-    return proccededBlock;
+    return processedBlock;
   }
 
   async _proceedTx(tx, block) {
