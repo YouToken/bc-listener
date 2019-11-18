@@ -28,7 +28,7 @@ module.exports = (addr, logger) => {
         .call();
       let txs = [];
       let page = await ledger.transactions();
-      while (page.records.length) {
+      while (page.records && page.records.length) {
         for (let tx of page.records) {
           txs.push(tx);
         }
