@@ -42,7 +42,7 @@ class AsyncListener extends Listener {
 
     const queue = new PQueue({
       concurrency: this.async.blocks,
-      timeout: this.async.timeout
+      timeout: 30000
     });
 
     fork: for (let i = fromBlock; i <= toBlock; i += this.async.blocks) {
@@ -107,7 +107,8 @@ class AsyncListener extends Listener {
 
     const queue = new PQueue({
       concurrency: this.async.txs,
-      timeout: this.async.timeout
+      timeout: this.async.timeout,
+      throwOnTimeout: true
     });
 
     for (let j = 0; j < block.txs.length; j += this.async.txs) {
