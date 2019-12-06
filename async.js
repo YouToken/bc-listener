@@ -108,7 +108,7 @@ class AsyncListener extends Listener {
     const queue = new PQueue({
       concurrency: this.async.txs,
       timeout: this.async.timeout,
-      throwOnTimeout: true
+      // throwOnTimeout: true
     });
 
     for (let j = 0; j < block.txs.length; j += this.async.txs) {
