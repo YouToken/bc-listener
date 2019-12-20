@@ -73,6 +73,7 @@ module.exports = class XRP {
       }
       result[outcome.ledgerVersion].push(tx);
     }
+    return result;
   }
 
   async getHeight() {
