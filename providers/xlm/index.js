@@ -7,6 +7,7 @@ module.exports = class XLM {
   constructor(conf) {
     this.currency = conf.currency ? conf.currency : 'xlm';
     this.client = restClient(conf.url, conf.logger ? conf.logger : logger);
+    this.HOT = conf.hot;
   }
 
   getCurrency() {
