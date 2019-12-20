@@ -15,46 +15,25 @@ module.exports = class XRP {
   }
 
   async getBlock(height) {
-    try {
-      let ledger = await this.client.getLedger({ledgerVersion: height});
-      // TODO in fact we have only the one hot address
-      let txs = await this.client.getTransactions(this.HOT, {
-        minLedgerVersion: height,
-        maxLedgerVersion: height
-      });
-      return {
-        hash: ledger.ledgerHash,
-        prev_hash: ledger.parentLedgerHash,
-        height,
-        timestamp: new Date(ledger.closeTime),
-        txs: txs ? txs : []
-      }
-    } catch (e) {
-      return {
-        hash: null,
-        prev_hash: null,
-        height,
-        txs: []
-      }
+    let block = await this.getBlockInfo(height);
+    // TODO in fact we have only the one hot address
+    let txs = await this.client.getTransactions(this.HOT, {
+      minLedgerVersion: height,
+      maxLedgerVersion: height
+    });
+    return {
+      ...block,
+      txs: txs ? txs : []
     }
   }
 
   async getBlockInfo(height) {
-    try {
-      let ledger = await this.client.getLedger({ledgerVersion: height});
-      return {
-        hash: ledger.ledgerHash,
-        prev_hash: ledger.parentLedgerHash,
-        height,
-        timestamp: new Date(ledger.closeTime),
-      }
-    } catch (e) {
-      return {
-        hash: null,
-        prev_hash: null,
-        height,
-        timestamp: null,
-      }
+    let ledger = await this.client.getLedger({ledgerVersion: height});
+    return {
+      hash: ledger.ledgerHash,
+      prev_hash: ledger.parentLedgerHash,
+      height,
+      timestamp: new Date(ledger.closeTime),
     }
   }
 
