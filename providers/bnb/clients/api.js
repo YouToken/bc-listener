@@ -16,6 +16,11 @@ module.exports = (addr) => {
         .then(response => response.body.sequence);
     },
 
+    async getAccountTransactions(account) {
+      return this._execute('getAccountTransactions', 1, request.get, `${addr}/api/v1/transactions?address=${account}&txAsset=BNB&txType=TRANSFER`)
+        .then(response => response.body.tx);
+    },
+
     async _execute(key, rateLimit, fn, ...args) {
       return new Promise((resolve, reject) => {
         let now = new Date().getTime();
