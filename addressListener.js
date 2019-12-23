@@ -39,7 +39,7 @@ class AddressListener extends Listener {
         let block = await this.provider.getBlockInfo(+height);
         let txs = blockTxs[height].map(async (tx) => ({
           original: tx,
-          processed: await this.provider.proceedTransaction(tx)
+          processed: await this.provider.proceedTransaction(tx, block)
         }));
         await this.confirm([{
           height,

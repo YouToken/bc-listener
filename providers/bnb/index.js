@@ -32,16 +32,16 @@ module.exports = class BNB {
   }
 
   async getHotAddressTransactions(fromHeight, toHeight) {
-    let txs = await this.api.getAccountTransactions(this.HOT);
-
     let result = {};
+    let txs = await this.api.getAccountTransactions(this.HOT);
     for (let tx of txs) {
       if (tx.blockHeight < fromHeight) break;
       if (tx.blockHeight > toHeight) continue;
       if (!result[tx.blockHeight]) {
         result[tx.blockHeight] = [];
       }
-      result[tx.blockHeight].push(tx);
+      let txInRpcFormat = await this.client.rpc.tx({hash: Buffer.from(tx.txHash, 'hex')});
+      result[tx.blockHeight].push(txInRpcFormat);
     }
     return result;
   }
