@@ -1,12 +1,12 @@
 'use strict';
 
-const wssClient = require('./clients/wss');
+const wsClient = require('./clients/ws');
 const {logger} = require('../../defaults');
 
 module.exports = class XRP {
   constructor(conf) {
     this.currency = conf.currency ? conf.currency : 'xrp';
-    this.client = wssClient(conf.url, conf.delay || 1000, conf.logger || logger);
+    this.client = wsClient(conf.url, conf.delay || 1000, conf.logger || logger);
     this.HOT = conf.hot;
   }
 

@@ -12,7 +12,6 @@ module.exports = ({saveUnconfirmed=()=>{}, clearUnconfirmed=()=>{}, confirm=()=>
     push(smth) {
       log('debug', 'push to chain');
       let toClear = [];
-      let toConfirm = [];
       let found = false;
       for (let i = 0; i < chain.length; i++) {
         if (isParent(chain[i], smth)) {
@@ -32,6 +31,8 @@ module.exports = ({saveUnconfirmed=()=>{}, clearUnconfirmed=()=>{}, confirm=()=>
         throw new Error('parent not found');
       }
       log('debug', `chain length=${chain.length}, max_length=${max_length}`);
+
+      let toConfirm = [];
       while (chain.length >= max_length) toConfirm.push(chain.shift());
 
       clearUnconfirmed(toClear);

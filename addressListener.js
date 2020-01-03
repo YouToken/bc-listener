@@ -1,6 +1,6 @@
 "use strict";
 
-const Listener = require("./index");
+const Listener = require("./listener");
 const _ = require("lodash");
 
 class AddressListener extends Listener {
