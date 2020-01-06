@@ -118,7 +118,7 @@ class AsyncListener extends Listener {
       for (let k = j; k < lastTx; k++) {
         let tx = block.txs[k];
         queue.add(async () => {
-          let processed = await this.provider.proceedTransaction(tx, block);
+          let processed = await this.proceedTransaction(tx, block);
 
           if (!processed.length) return;
 
@@ -160,7 +160,7 @@ class AsyncListener extends Listener {
   }
 
   async _proceedTx(tx, block) {
-    let processed = await this.provider.proceedTransaction(tx, block);
+    let processed = await this.proceedTransaction(tx, block);
 
     if (!processed.length) return { standard: [], instant: [] };
 

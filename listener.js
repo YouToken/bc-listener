@@ -17,6 +17,7 @@ class Listener extends EventEmitter {
     super();
     required('config', config);
     required('config.provider', config.provider);
+    required('config.txProcessors', config.txProcessors);
     required('config.storage', config.storage);
 
     this.logger = config.logger ? config.logger : defaults.logger;
@@ -25,6 +26,7 @@ class Listener extends EventEmitter {
     let currency = config.provider.getCurrency();
     let settings = _.pick(config, _.keys(defaults.config));
     getter(this, 'provider', _.defaults(config.provider, defaults.provider(currency)));
+    getter(this, 'txProcessors', config.txProcessors);
     getter(this, 'storage', _.defaults(config.storage, defaults.storage(currency, this.logger)));
     getter(this, 'config', parseConfig(_.defaults(settings, defaults.config)));
 
@@ -126,7 +128,7 @@ class Listener extends EventEmitter {
     for (let i = 0; i < pool.length; i++) {
       pool[i] = {
         original: pool[i],
-        processed: await this.provider.proceedTransaction(pool[i])
+        processed: await this.proceedTransaction(pool[i])
       };
     }
     await this.storage.saveUnconfirmed('pool', pool);
@@ -152,7 +154,7 @@ class Listener extends EventEmitter {
       let standardTxs = [];
       let instantTxs = [];
       for (let j = 0; j < block.txs.length; j++) {
-        let processed = await this.provider.proceedTransaction(block.txs[j]);
+        let processed = await this.proceedTransaction(block.txs[j]);
         let standard = processed.filter(tx => !tx.instant);
         if (standard.length) {
           standardTxs.push({
@@ -202,6 +204,12 @@ class Listener extends EventEmitter {
       this.emit('save_height', toBlock + 1);
     }
     this.log('debug', 'worker finished');
+  }
+
+  async proceedTransaction(tx, block) {
+    let txs = this.txProcessors.map(processor => processor.proceedTransaction(tx, block));
+    let processed = await Promise.all(txs);
+    return _.flatten(processed);
   }
 
   async resync(from = 'saved', to = 'latest') {
