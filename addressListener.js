@@ -1,6 +1,6 @@
 "use strict";
 
-const Listener = require("./index");
+const Listener = require("./listener");
 const _ = require("lodash");
 
 class AddressListener extends Listener {
@@ -39,7 +39,7 @@ class AddressListener extends Listener {
         let block = await this.provider.getBlockInfo(+height);
         let txs = blockTxs[height].map(async (tx) => ({
           original: tx,
-          processed: await this.provider.proceedTransaction(tx, block)
+          processed: await this.proceedTransaction(tx, block)
         }));
         await this.confirm([{
           height,

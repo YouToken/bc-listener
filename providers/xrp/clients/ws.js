@@ -3,7 +3,11 @@ const RippleAPI = require('ripple-lib').RippleAPI;
 module.exports = (addr, delay, logger) => {
 
   function log(level, msg) {
-    logger[level](`listener:xrp ${msg}`);
+    if (level === "error") {
+      logger[level](new Error(msg));
+    } else {
+      logger[level](`listener:xrp ${msg}`);
+    }
   }
 
   function shouldReconnect(e) {
