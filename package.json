@@ -18,6 +18,7 @@
   "homepage": "https://github.com/YouToken/bc-listener#readme",
   "dependencies": {
     "@binance-chain/javascript-sdk": "^2.16.0",
+    "@dfuse/client": "^0.3.6",
     "bignumber.js": "^9.0.0",
     "bitcoin-core": "^2.2.0",
     "eosjs": "^20.0.0",
