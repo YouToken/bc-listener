@@ -17,11 +17,11 @@ module.exports = class EOS {
   }
 
   async getBlock(height) {
-    return this.client.getBlock(height)
+    return this.dfuse.getBlock(height)
   }
 
   async getBlockInfo(height) {
-    let block = await this.client.rpc.get_block(height);
+    let block = await this.dfuse.client.apiRequest("/v1/chain/get_block", "POST", {}, {"block_num_or_id": height});
     return {
       height: block.block_num,
       hash: block.id,
@@ -41,11 +41,11 @@ module.exports = class EOS {
   }
 
   async getHeight() {
-    return this.client.getCurrentHeight()
+    return this.dfuse.getCurrentHeight()
   }
 
   async getPool() {
-    return this.client.getPool()
+    return this.dfuse.getPool()
   }
 
   async proceedTransaction(tx) {
