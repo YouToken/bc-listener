@@ -1,11 +1,6 @@
 'use strict';
 
-const {JsonRpc} = require('eosjs');
-const fetch = require('node-fetch');
-
-module.exports = (addr, logger) => {
-  const rpc = new JsonRpc(addr, {fetch});
-
+module.exports = (rpc, logger) => {
   return {
     rpc,
 

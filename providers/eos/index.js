@@ -1,14 +1,20 @@
 'use strict';
 
-const rpcClient = require('./clients/rpc');
+const {JsonRpc} = require('eosjs');
+const fetch = require('node-fetch');
+const DfuseJsonRpc = require('./clients/dfuse-jsonrpc');
 const dfuseClient = require('./clients/dfuse');
+const rpcClient = require('./clients/rpc');
 const {logger} = require('../../defaults');
 
 module.exports = class EOS {
   constructor(conf) {
     this.currency = conf.currency ? conf.currency : 'eos';
-    this.client = rpcClient(conf.url, conf.logger ? conf.logger : logger);
     this.dfuse = dfuseClient(conf.dfuseApiKey, conf.dfuseNetwork);
+    let jsonRpc = this.dfuse.client
+      ? new DfuseJsonRpc(this.dfuse.client)
+      : new JsonRpc(conf.url, {fetch});
+    this.client = rpcClient(jsonRpc, conf.logger ? conf.logger : logger);
     this.HOT = conf.hot;
   }
 
@@ -17,11 +23,11 @@ module.exports = class EOS {
   }
 
   async getBlock(height) {
-    return this.dfuse.getBlock(height)
+    return this.client.getBlock(height)
   }
 
   async getBlockInfo(height) {
-    let block = await this.dfuse.client.apiRequest("/v1/chain/get_block", "POST", {}, {"block_num_or_id": height});
+    let block = await this.client.rpc.get_block(height);
     return {
       height: block.block_num,
       hash: block.id,
@@ -41,11 +47,11 @@ module.exports = class EOS {
   }
 
   async getHeight() {
-    return this.dfuse.getCurrentHeight()
+    return this.client.getCurrentHeight()
   }
 
   async getPool() {
-    return this.dfuse.getPool()
+    return this.client.getPool()
   }
 
   async proceedTransaction(tx) {
