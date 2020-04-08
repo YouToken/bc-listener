@@ -14,7 +14,7 @@ module.exports = (addr, timeout = 30 * 1000, logger) => {
   });
   return {
     async cmd(command, ...args) {
-      return new Promise((resolve, reject) => client.command(command, ...args, (err, result) => err ? reject(err) : resolve(result)));
+      return client.command(command, ...args);
     },
     async getCurrentHeight() {
       return this.cmd('getblockcount');
