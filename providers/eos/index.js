@@ -4,6 +4,7 @@ const {JsonRpc} = require('eosjs');
 const fetch = require('node-fetch');
 const DfuseJsonRpc = require('./clients/dfuse-jsonrpc');
 const dfuseClient = require('./clients/dfuse');
+const greymassClient = require('./clients/greymass');
 const rpcClient = require('./clients/rpc');
 const {logger} = require('../../defaults');
 
@@ -11,6 +12,7 @@ module.exports = class EOS {
   constructor(conf) {
     this.currency = conf.currency ? conf.currency : 'eos';
     this.dfuse = dfuseClient(conf.dfuseApiKey, conf.dfuseNetwork);
+    this.greymass = greymassClient();
     let jsonRpc = this.dfuse.client
       ? new DfuseJsonRpc(this.dfuse.client)
       : new JsonRpc(conf.url, {fetch});
@@ -38,7 +40,7 @@ module.exports = class EOS {
 
   async getHotAddressTransactions(fromHeight, toHeight) {
     let result = {};
-    let blockHeights = await this.dfuse.getAccountBlockHeights(this.HOT, fromHeight, toHeight);
+    let blockHeights = await this.greymass.getAccountBlockHeights(this.HOT, fromHeight, toHeight);
     for (let blockHeight of blockHeights) {
       let block = await this.getBlock(blockHeight);
       result[blockHeight] = block.txs;
