@@ -16,7 +16,10 @@ module.exports = (conf = {}) => {
       if (command === 'getbalance') {
         return await request
           .get(`https://api.blockchair.com/${NETWORK}/addresses/balances?addresses=${args[0]}`)
-          .then(response => response.body.data[args[0]]);
+          .then(response => {
+            let balance = response.body.data[args[0]];
+            return balance ? balance : 0;
+          });
       }
     },
 
