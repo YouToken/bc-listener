@@ -1,13 +1,5 @@
 const RippleAPI = require('ripple-lib').RippleAPI;
 
-function log(level, msg) {
-  if (level === "error") {
-    logger[level](new Error(msg));
-  } else {
-    logger[level](`listener:xrp ${msg}`);
-  }
-}
-
 function shouldReconnect(e) {
   return e.name && (e.name === 'TimeoutError' || e.name === 'DisconnectedError');
 }
@@ -21,7 +13,7 @@ async function sleep(delay) {
   return new Promise(resolve => setTimeout(resolve, delay));
 }
 
-module.exports = class RippleWs  {
+module.exports = class RippleWs {
 
   init({url, delay = 1000, logger}) {
     const api = new RippleAPI({
@@ -32,18 +24,18 @@ module.exports = class RippleWs  {
     });
 
     api.on('error', (errorCode, errorMessage) => {
-      log('error', `Received error: ${errorCode}, ${errorMessage}`);
+      logger.error(new Error(`Received error: ${errorCode}, ${errorMessage}`));
     });
 
     api.on('connected', () => {
-      log('info', 'Connection is open');
+      logger.info('Connection is open');
     });
 
     api.on('disconnected', (code) => {
       if (code !== 1000) {
-        log('error', `Connection has been closed due to error: ${code}`);
+        logger.error(new Error(`Connection has been closed due to error: ${code}`));
       } else {
-        log('info', 'Connection has been closed normally');
+        logger.info('Connection has been closed normally');
       }
     });
 
@@ -66,7 +58,7 @@ module.exports = class RippleWs  {
               }
             }
             if (method !== 'getSettings' && shouldRetryRequest(e)) {
-              log('info', `RETRYING ${method}`);
+              logger.info(`RETRYING ${method}`);
               await sleep(delay);
               return exec(...args);
             }
