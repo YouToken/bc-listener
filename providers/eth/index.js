@@ -1,31 +1,24 @@
 'use strict';
 
-const rpcClient = require('./clients/rpc');
-const {logger} = require('../../defaults');
+const Provider = require('../provider');
+const EthereumRpc = require('./clients/rpc');
 
-module.exports = class ETH {
-  constructor(conf) {
-    this.currency = conf.currency ? conf.currency : 'eth';
-    this.client = rpcClient(conf.url, conf.logger ? conf.logger : logger);
-  }
+module.exports = class ETH extends Provider {
 
-  getCurrency() {
-    return this.currency
+  constructor(options) {
+    super(options.currency || 'eth');
+    this.client = new EthereumRpc(options);
   }
 
   async getBlock(height) {
-    return this.client.getBlock(height)
+    return this.client.getBlock(height);
   }
 
   async getHeight() {
-    return this.client.getCurrentHeight()
+    return this.client.getCurrentHeight();
   }
 
   async getPool() {
-    return []
-  }
-
-  async proceedTransaction(tx) {
-    throw new Error('proceedTransaction method is not specified')
+    return [];
   }
 };

@@ -1,23 +1,20 @@
 'use strict';
 
-const rpcClient = require('./clients/rpc');
-const apiClient = require('./clients/api');
-const {logger} = require('../../defaults');
+const Provider = require('../provider');
+const BinanceRpc = require('./clients/rpc');
+const BinanceApi = require('./clients/api');
 
-module.exports = class BNB {
-  constructor(conf) {
-    this.currency = conf.currency ? conf.currency : 'bnb';
-    this.client = rpcClient(conf.url, conf.logger ? conf.logger : logger);
-    this.api = apiClient(conf.apiUrl);
-    this.HOT = conf.hot;
-  }
+module.exports = class BNB extends Provider {
 
-  getCurrency() {
-    return this.currency
+  constructor(options) {
+    super(options.currency || 'bnb');
+    this.client = new BinanceRpc(options);
+    this.api = new BinanceApi({url: options.apiUrl});
+    this.HOT = options.hot;
   }
 
   async getBlock(height) {
-    return this.client.getBlock(height)
+    return this.client.getBlock(height);
   }
 
   async getBlockInfo(height) {
@@ -47,14 +44,10 @@ module.exports = class BNB {
   }
 
   async getHeight() {
-    return this.client.getCurrentHeight()
+    return this.client.getCurrentHeight();
   }
 
   async getPool() {
-    return this.client.getPool()
-  }
-
-  async proceedTransaction(tx) {
-    throw new Error('proceedTransaction method is not specified')
+    return [];
   }
 };

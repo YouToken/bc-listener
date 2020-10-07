@@ -25,7 +25,7 @@ class Listener extends EventEmitter {
 
     let currency = config.provider.getCurrency();
     let settings = _.pick(config, _.keys(defaults.config));
-    getter(this, 'provider', _.defaults(config.provider, defaults.provider(currency)));
+    getter(this, 'provider', config.provider);
     getter(this, 'txProcessors', config.txProcessors);
     getter(this, 'storage', _.defaults(config.storage, defaults.storage(currency, this.logger)));
     getter(this, 'config', parseConfig(_.defaults(settings, defaults.config)));

@@ -2,19 +2,21 @@
 
 const request = require('superagent');
 
-module.exports = (conf = {}) => {
-  const NETWORK = conf.network;
+module.exports = class ChainSo {
 
-  return {
-    async cmd(command, ...args) {
-      if (command === 'getblockcount') {
-        return await request
-          .get(`https://chain.so/api/v2/get_info/${NETWORK}`)
-          .then(response => response.body.data.blocks);
-      }
-    },
-    async getCurrentHeight() {
-      return this.cmd('getblockcount');
+  constructor({network}) {
+    this.NETWORK = network;
+  }
+
+  async cmd(command, ...args) {
+    if (command === 'getblockcount') {
+      return request
+        .get(`https://chain.so/api/v2/get_info/${this.NETWORK}`)
+        .then(response => response.body.data.blocks);
     }
   }
-};
+
+  async getCurrentHeight() {
+    return this.cmd('getblockcount');
+  }
+}
