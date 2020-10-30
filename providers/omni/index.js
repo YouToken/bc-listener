@@ -1,31 +1,24 @@
 'use strict';
 
-const rpcClient = require('./clients/rpc');
-const {logger} = require('../../defaults');
+const Provider = require('../provider');
+const OmniRpc = require('./clients/rpc');
 
-module.exports = class Omni {
-  constructor(conf) {
-    this.currency = conf.currency ? conf.currency : 'omni';
-    this.client = rpcClient(conf.url, conf.logger ? conf.logger : logger);
-  }
+module.exports = class Omni extends Provider {
 
-  getCurrency() {
-    return this.currency
+  constructor(options) {
+    super(options.currency || 'omni');
+    this.client = new OmniRpc(options);
   }
 
   async getBlock(height) {
-    return this.client.getBlock(height)
+    return this.client.getBlock(height);
   }
 
   async getHeight() {
-    return this.client.getCurrentHeight()
+    return this.client.getCurrentHeight();
   }
 
   async getPool() {
-    return this.client.getPool()
+    return this.client.getPool();
   }
-
-  async proceedTransaction(txid) {
-    throw new Error('proceedTransaction method is not specified')
-  }
-};
+}

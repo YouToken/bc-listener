@@ -3,33 +3,34 @@
 const request = require('superagent');
 const BigNumber = require('bignumber.js');
 
-module.exports = (conf = {}) => {
-  const NETWORK = conf.network;
+module.exports = class BlockchairCom {
 
-  return {
-    async cmd(command, ...args) {
-      if (command === 'getblockcount') {
-        return await request
-          .get(`https://api.blockchair.com/${NETWORK}/stats`)
-          .then(response => response.body.data.blocks);
-      }
-      if (command === 'getbalance') {
-        return await request
-          .get(`https://api.blockchair.com/${NETWORK}/addresses/balances?addresses=${args[0]}`)
-          .then(response => {
-            let balance = response.body.data[args[0]];
-            return balance ? balance : 0;
-          });
-      }
-    },
+  constructor({network}) {
+    this.NETWORK = network;
+  }
 
-    async getCurrentHeight() {
-      return this.cmd('getblockcount');
-    },
-
-    async getBalance(address) {
-      let balance = await this.cmd('getbalance', address);
-      return new BigNumber(balance).div('100000000');
+  async cmd(command, ...args) {
+    if (command === 'getblockcount') {
+      return request
+        .get(`https://api.blockchair.com/${this.NETWORK}/stats`)
+        .then(response => response.body.data.blocks);
+    }
+    if (command === 'getbalance') {
+      return request
+        .get(`https://api.blockchair.com/${this.NETWORK}/addresses/balances?addresses=${args[0]}`)
+        .then(response => {
+          let balance = response.body.data[args[0]];
+          return balance ? balance : 0;
+        });
     }
   }
-};
+
+  async getCurrentHeight() {
+    return this.cmd('getblockcount');
+  }
+
+  async getBalance(address) {
+    let balance = await this.cmd('getbalance', address);
+    return new BigNumber(balance).div('100000000');
+  }
+}

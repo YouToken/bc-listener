@@ -1,17 +1,14 @@
 'use strict';
 
-const wsClient = require('./clients/ws');
-const {logger} = require('../../defaults');
+const Provider = require('../provider');
+const RippleWs = require('./clients/ws');
 
-module.exports = class XRP {
-  constructor(conf) {
-    this.currency = conf.currency ? conf.currency : 'xrp';
-    this.client = wsClient(conf.url, conf.delay || 1000, conf.logger || logger);
-    this.HOT = conf.hot;
-  }
+module.exports = class XRP extends Provider {
 
-  getCurrency() {
-    return this.currency
+  constructor(options) {
+    super(options.currency || 'xrp');
+    this.HOT = options.hot;
+    this.client = new RippleWs().init(options);
   }
 
   async getBlock(height) {
@@ -61,10 +58,6 @@ module.exports = class XRP {
   }
 
   async getPool() {
-    return []
+    return [];
   }
-
-  async proceedTransaction(tx) {
-    throw new Error('proceedTransaction method is not specified')
-  }
-};
+}

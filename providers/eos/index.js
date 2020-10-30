@@ -1,31 +1,20 @@
 'use strict';
 
-const {JsonRpc} = require('eosjs');
-const fetch = require('node-fetch');
-const DfuseJsonRpc = require('./clients/dfuse-jsonrpc');
-const dfuseClient = require('./clients/dfuse');
-const greymassClient = require('./clients/greymass');
-const rpcClient = require('./clients/rpc');
-const {logger} = require('../../defaults');
+const Provider = require('../provider');
+const GreymassApi = require('./clients/greymass');
+const EosRpc = require('./clients/rpc');
 
-module.exports = class EOS {
-  constructor(conf) {
-    this.currency = conf.currency ? conf.currency : 'eos';
-    this.dfuse = dfuseClient(conf.dfuseApiKey, conf.dfuseNetwork);
-    this.greymass = greymassClient();
-    let jsonRpc = this.dfuse.client
-      ? new DfuseJsonRpc(this.dfuse.client)
-      : new JsonRpc(conf.url, {fetch});
-    this.client = rpcClient(jsonRpc, conf.logger ? conf.logger : logger);
-    this.HOT = conf.hot;
-  }
+module.exports = class EOS extends Provider {
 
-  getCurrency() {
-    return this.currency
+  constructor(options) {
+    super(options.currency || 'eos');
+    this.HOT = options.hot;
+    this.client = new EosRpc(options);
+    this.greymass = new GreymassApi();
   }
 
   async getBlock(height) {
-    return this.client.getBlock(height)
+    return this.client.getBlock(height);
   }
 
   async getBlockInfo(height) {
@@ -49,14 +38,10 @@ module.exports = class EOS {
   }
 
   async getHeight() {
-    return this.client.getCurrentHeight()
+    return this.client.getCurrentHeight();
   }
 
   async getPool() {
-    return this.client.getPool()
-  }
-
-  async proceedTransaction(tx) {
-    throw new Error('proceedTransaction method is not specified')
+    return [];
   }
 };

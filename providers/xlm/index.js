@@ -1,21 +1,18 @@
 'use strict';
 
-const restClient = require('./clients/rest');
-const {logger} = require('../../defaults');
+const Provider = require('../provider');
+const StellarApi = require('./clients/rest');
 
-module.exports = class XLM {
-  constructor(conf) {
-    this.currency = conf.currency ? conf.currency : 'xlm';
-    this.client = restClient(conf.url, conf.logger ? conf.logger : logger);
-    this.HOT = conf.hot;
-  }
+module.exports = class XLM extends Provider {
 
-  getCurrency() {
-    return this.currency
+  constructor(options) {
+    super(options.currency || 'xlm');
+    this.HOT = options.hot;
+    this.client = new StellarApi(options);
   }
 
   async getBlock(height) {
-    return this.client.getBlock(height)
+    return this.client.getBlock(height);
   }
 
   async getBlockInfo(height) {
@@ -58,14 +55,10 @@ module.exports = class XLM {
   }
 
   async getHeight() {
-    return this.client.getCurrentHeight()
+    return this.client.getCurrentHeight();
   }
 
   async getPool() {
-    return this.client.getPool()
+    return [];
   }
-
-  async proceedTransaction(tx) {
-    throw new Error('proceedTransaction method is not specified')
-  }
-};
+}
