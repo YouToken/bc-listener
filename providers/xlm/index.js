@@ -3,6 +3,8 @@
 const Provider = require('../provider');
 const StellarApi = require('./clients/rest');
 
+const PAGE_MAX_LIMIT = 200;
+
 module.exports = class XLM extends Provider {
 
   constructor(options) {
@@ -30,6 +32,8 @@ module.exports = class XLM extends Provider {
 
   async getHotAddressTransactions(fromHeight, toHeight) {
     let pageSize = toHeight - fromHeight;
+    pageSize = pageSize < PAGE_MAX_LIMIT ? pageSize : PAGE_MAX_LIMIT;
+    
     let page = await this.client.api.transactions()
       .forAccount(this.HOT)
       .order('desc')
