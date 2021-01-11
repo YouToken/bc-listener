@@ -11,7 +11,8 @@ module.exports = class EosRpc {
 
   async getCurrentHeight() {
     let info = await this.rpc.get_info();
-    return info.head_block_num;
+    // return info.head_block_num;
+    return info.last_irreversible_block_num;
   }
 
   async getBlock(height) {
