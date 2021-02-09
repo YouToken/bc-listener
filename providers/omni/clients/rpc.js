@@ -21,8 +21,10 @@ module.exports = class OmniRpc {
   }
 
   async getCurrentHeight() {
-    let info = await this.cmd('omni_getinfo');
-    return info.block;
+    return this.cmd('getblockcount');
+    // don't use omni_getinfo (it's very slow)
+    // let info = await this.cmd('omni_getinfo');
+    // return info.block;
   }
 
   async getPool() {
