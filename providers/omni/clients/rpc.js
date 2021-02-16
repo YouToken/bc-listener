@@ -22,7 +22,7 @@ module.exports = class OmniRpc {
 
   async getCurrentHeight() {
     let height = await this.cmd('getblockcount');
-    return +height - 1;
+    return +height - 2;
     // don't use omni_getinfo (it's very slow)
     // let info = await this.cmd('omni_getinfo');
     // return info.block;
