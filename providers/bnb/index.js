@@ -37,14 +37,15 @@ module.exports = class BNB extends Provider {
       if (!result[tx.blockHeight]) {
         result[tx.blockHeight] = [];
       }
-      let txInRpcFormat = await this.client.rpc.tx({hash: Buffer.from(tx.txHash, 'hex')});
-      result[tx.blockHeight].push(txInRpcFormat);
+      let txJSON = await this.api.getTransaction(tx.txHash);
+      result[tx.blockHeight].push(txJSON);
     }
     return result;
   }
 
   async getHeight() {
-    return this.client.getCurrentHeight();
+    let status = await this.api.getStatus();
+    return +status.sync_info.latest_block_height;
   }
 
   async getPool() {

@@ -9,6 +9,11 @@ module.exports = class BinanceApi {
     this.timeLimit = {};
   }
 
+  async getStatus() {
+    return this._execute('getStatus', 1, request.get, `${this.URL}/api/v1/node-info`)
+      .then(response => response.body);
+  }
+
   async getAccount(account) {
     return this._execute('getAccount', 5, request.get, `${this.URL}/api/v1/account/${account}`)
       .then(response => response.body);
@@ -22,6 +27,11 @@ module.exports = class BinanceApi {
   async getAccountTransactions(account) {
     return this._execute('getAccountTransactions', 1, request.get, `${this.URL}/api/v1/transactions?address=${account}&txAsset=BNB&txType=TRANSFER`)
       .then(response => response.body.tx);
+  }
+
+  async getTransaction(hash) {
+    return this._execute('getTransaction', 10, request.get, `/api/v1/tx/${hash}?format=json`)
+      .then(response => response.body);
   }
 
   async _execute(key, rateLimit, fn, ...args) {
