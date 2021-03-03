@@ -30,7 +30,7 @@ module.exports = class BinanceApi {
   }
 
   async getTransaction(hash) {
-    return this._execute('getTransaction', 10, request.get, `/api/v1/tx/${hash}?format=json`)
+    return this._execute('getTransaction', 10, request.get, `${this.URL}/api/v1/tx/${hash}?format=json`)
       .then(response => response.body);
   }
 
