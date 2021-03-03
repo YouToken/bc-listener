@@ -10,7 +10,7 @@ module.exports = class BinanceRpc {
 
   async getCurrentHeight() {
     let status = await this.rpc.status();
-    return +status.sync_info.latest_block_height - 100;
+    return +status.sync_info.latest_block_height;
   }
 
   async getBlock(height) {

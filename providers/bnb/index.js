@@ -14,7 +14,9 @@ module.exports = class BNB extends Provider {
   }
 
   async getBlock(height) {
-    return this.client.getBlock(height);
+    let block = await this.client.getBlock(height);
+    block.txs = block.txs.map(async tx => await this.api.getTransaction(tx.hash));
+    return block;
   }
 
   async getBlockInfo(height) {
