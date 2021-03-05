@@ -4,6 +4,8 @@ const Provider = require('../provider');
 const BinanceRpc = require('./clients/rpc');
 const BinanceApi = require('./clients/api');
 
+const Cache = require('../../utils/cache');
+
 module.exports = class BNB extends Provider {
 
   constructor(options) {
@@ -11,6 +13,7 @@ module.exports = class BNB extends Provider {
     this.client = new BinanceRpc(options);
     this.api = new BinanceApi({url: options.apiUrl});
     this.HOT = options.hot;
+    this.cache = new Cache();
   }
 
   async getBlock(height) {
@@ -48,7 +51,7 @@ module.exports = class BNB extends Provider {
   }
 
   async getHeight() {
-    let status = await this.api.getStatus();
+    let status = await this.cache.getWithCache('api_getStatus', () => this.api.getStatus(), 60);
     return +status.sync_info.latest_block_height;
   }
 
