@@ -3,23 +3,7 @@
 const BitcoinClient = require('bitcoin-core');
 const urlParser = require('url');
 
-let cache = {};
-
-async function getWithCache(key, promise, lifetime = 60) {
-  let item = cache[key];
-  if (!item || new Date().getTime() > item.expireAt) {
-    cache[key] = {
-      data: promise()
-        .then(result => result)
-        .catch(e => {
-          delete cache[key];
-          throw e;
-        }),
-      expireAt: new Date().getTime() + lifetime * 1000
-    }
-  }
-  return cache[key].data;
-}
+const Cache = require('../../../utils/cache');
 
 module.exports = class OmniRpc {
 
@@ -33,6 +17,7 @@ module.exports = class OmniRpc {
       password,
       timeout: 60000
     });
+    this.cache = new Cache();
   }
 
   async cmd(command, ...args) {
@@ -41,7 +26,7 @@ module.exports = class OmniRpc {
 
   async getCurrentHeight() {
     // omni_getinfo is very slow, so use cache for it
-    let info = await getWithCache('omni_getinfo', () => this.cmd('omni_getinfo'), 300);
+    let info = await this.cache.getWithCache('omni_getinfo', () => this.cmd('omni_getinfo'), 300);
     return info.block;
   }
 

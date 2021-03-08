@@ -46,11 +46,8 @@ module.exports = class EthereumRpc {
     if (command === 'eth_getBlockByNumber') {
       // let data = await this.eth.getBlock(+args[0], true);
       // get block by raw rpc call because of https://github.com/binance-chain/bsc/issues/44
-      let block = await this._rpcCall("eth_getBlockByNumber", [formatters.inputBlockNumberFormatter(+args[0]), true]);
-      block.transactions = block.transactions.filter(tx => ![
-        "0x0000000000000000000000000000000000001000", // Validator set
-        "0x0000000000000000000000000000000000001001"  // SlashIndicator
-      ].includes(tx.to));
+      let block = await this._rpcCall('eth_getBlockByNumber', [formatters.inputBlockNumberFormatter(+args[0]), true]);
+      block.transactions = block.transactions.filter(tx => tx.gas !== '0x7fffffffffffffff');
       let data = formatters.outputBlockFormatter(block);
       for (let tx of data.transactions) {
         tx.receipt = await this.cmd('eth_getTransactionReceipt', tx.hash);
