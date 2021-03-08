@@ -3,10 +3,13 @@
 const request = require('superagent');
 const BigNumber = require('bignumber.js');
 
+const Cache = require('../../../utils/cache');
+
 module.exports = class BlockchairCom {
 
   constructor({network}) {
     this.NETWORK = network;
+    this.cache = new Cache();
   }
 
   async cmd(command, ...args) {
@@ -26,7 +29,7 @@ module.exports = class BlockchairCom {
   }
 
   async getCurrentHeight() {
-    return this.cmd('getblockcount');
+    return this.cache.getWithCache('getblockcount', () => this.cmd('getblockcount'), 60);
   }
 
   async getBalance(address) {
