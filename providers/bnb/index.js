@@ -52,7 +52,7 @@ module.exports = class BNB extends Provider {
 
   async getHeight() {
     let status = await this.cache.getWithCache('api_getStatus', () => this.api.getStatus(), 60);
-    return +status.sync_info.latest_block_height;
+    return +status.sync_info.latest_block_height - 100;
   }
 
   async getPool() {
