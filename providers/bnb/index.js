@@ -25,7 +25,7 @@ module.exports = class BNB extends Provider {
   }
 
   async getBlockInfo(height) {
-    let block = await this.client.rpc.block({height});
+    let block = await this.client.call("block", {height});
     let blockHeader = block.block_meta.header;
     return {
       height: +blockHeader.height,

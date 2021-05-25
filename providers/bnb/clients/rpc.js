@@ -9,14 +9,14 @@ module.exports = class BinanceRpc {
   }
 
   async getCurrentHeight() {
-    let status = await this._call("status");
+    let status = await this.call("status");
     return +status.sync_info.latest_block_height;
   }
 
   async getBlock(height) {
-    let block = await this._call("block", {height});
+    let block = await this.call("block", {height});
     let blockHeader = block.block_meta.header;
-    let transactions = await this._call("tx_search", {query: `tx.height=${height}`});
+    let transactions = await this.call("tx_search", {query: `tx.height=${height}`});
     return {
       height: +blockHeader.height,
       hash: block.block_meta.block_id.hash,
@@ -26,7 +26,7 @@ module.exports = class BinanceRpc {
     }
   }
 
-  _call(method, args = {}) {
+  call(method, args = {}) {
     return request.get(`${this.URL}/${method}?${this._buildUrlArgs(args)}`)
       .then(response => {
         let body = response.body;
