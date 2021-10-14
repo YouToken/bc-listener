@@ -7,15 +7,15 @@ module.exports = class XMR extends Provider {
 
   constructor(options) {
     super(options.currency || 'xmr');
-    this.client = new MoneroRest(options);
+    this.clientRest = new MoneroRest(options);
   }
 
   async getBlock(height) {
-    return this.client.getBlock(height);
+    return this.clientRest.getBlock(height);
   }
 
   async getHeight() {
-    return this.client.getCurrentHeight();
+    return this.clientRest.getCurrentHeight();
   }
 
   async getPool() {
