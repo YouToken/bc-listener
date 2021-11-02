@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/YouToken/bc-listener#readme",
   "dependencies": {
+    "axios": "^0.24.0",
     "bignumber.js": "^9.0.1",
     "bitcoin-core": "^3.0.0",
     "eosjs": "^21.0.4",
