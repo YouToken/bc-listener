@@ -20,7 +20,7 @@ module.exports = class XMR extends Provider {
     return this.clientRest.getCurrentHeight();
   }
 
-  async request(method, params = {}) {
+  async request({method, params}) {
     return this.clientRpc.request({method, params});
   }
 
