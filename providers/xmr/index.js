@@ -5,7 +5,6 @@ const MoneroRest = require('./clients/rest');
 const MoneroRPC = require('./clients/rpc');
 
 module.exports = class XMR extends Provider {
-
   constructor(options) {
     super(options.currency || 'xmr');
     this.clientRest = new MoneroRest(options);

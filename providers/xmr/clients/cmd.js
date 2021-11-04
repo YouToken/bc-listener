@@ -1,0 +1,4 @@
+const REST_COMMAND_GET_HEIGHT = 'getHeight';
+const REST_COMMAND_GET_BLOCK = 'getBlock';
+
+module.exports = { REST_COMMAND_GET_BLOCK, REST_COMMAND_GET_HEIGHT };
