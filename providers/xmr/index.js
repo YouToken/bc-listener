@@ -12,15 +12,15 @@ module.exports = class XMR extends Provider {
   }
 
   async getBlock(height) {
-    return this.clientRest.getBlock(height);
+    return await this.clientRest.getBlock(height);
   }
 
   async getHeight() {
-    return this.clientRest.getCurrentHeight();
+    return await this.clientRest.getCurrentHeight();
   }
 
-  async request({method, params}) {
-    return this.clientRpc.request({method, params});
+  async request({ method, params }) {
+    return await this.clientRpc.request({ method, params });
   }
 
   async getPool() {

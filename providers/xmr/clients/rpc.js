@@ -18,7 +18,7 @@ module.exports = class MoneroRPC {
 
       return data.result;
     } catch (e) {
-      console.error(e);
+      return null;
     }
   }
 };
