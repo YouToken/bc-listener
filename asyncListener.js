@@ -113,7 +113,7 @@ class AsyncListener extends Listener {
     return {
       hash: data.hash,
       prev_hash: data.parentHash,
-      height,
+      height: i,
       timestamp: new Date(+data.timestamp * 1000),
       txs: data.transactions
     }
