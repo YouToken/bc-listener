@@ -3,6 +3,8 @@
 const Listener = require("./listener");
 const _ = require("lodash");
 const { default: PQueue } = require("p-queue");
+const formatters = require('web3-core-helpers').formatters;
+const BigNumber = require('bignumber.js');
 
 class AsyncListener extends Listener {
   constructor(config) {
