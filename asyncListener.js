@@ -93,7 +93,7 @@ class AsyncListener extends Listener {
 
   async _getBlock(i) {
     const blockStartTime = new Date().getTime();
-    const block = await this.provider._rpcCall('eth_getBlockByNumber', [formatters.inputBlockNumberFormatter(i), true]);
+    const block = await this.provider.client._rpcCall('eth_getBlockByNumber', [formatters.inputBlockNumberFormatter(i), true]);
     block.transactions = block.transactions.filter(tx => tx.gas !== '0x7fffffffffffffff');
     const data = formatters.outputBlockFormatter(block);
     
@@ -101,7 +101,7 @@ class AsyncListener extends Listener {
     
     for (let tx of data.transactions) {
       const now = new Date().getTime();
-      tx.receipt = await this.provider.cmd('eth_getTransactionReceipt', tx.hash);
+      tx.receipt = await this.provider.client.cmd('eth_getTransactionReceipt', tx.hash);
       avg += new Date().getTime() - now;
       tx.gasPrice = (new BigNumber(tx.gasPrice)).toString(10);
       tx.value = (new BigNumber(tx.value)).toString(10);
