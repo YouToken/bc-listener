@@ -89,10 +89,38 @@ class AsyncListener extends Listener {
     this.log("debug", "worker finished");
   }
 
+  async _getBlock(i) {
+    const blockStartTime = new Date().getTime();
+    const block = await this.provider._rpcCall('eth_getBlockByNumber', [formatters.inputBlockNumberFormatter(i), true]);
+    block.transactions = block.transactions.filter(tx => tx.gas !== '0x7fffffffffffffff');
+    const data = formatters.outputBlockFormatter(block);
+    
+    let avg = 0;
+    
+    for (let tx of data.transactions) {
+      const now = new Date().getTime();
+      tx.receipt = await this.provider.cmd('eth_getTransactionReceipt', tx.hash);
+      avg += new Date().getTime() - now;
+      tx.gasPrice = (new BigNumber(tx.gasPrice)).toString(10);
+      tx.value = (new BigNumber(tx.value)).toString(10);
+      tx.timestamp = data.timestamp;
+    }
+
+    this.log('info', `avg eth_getTransactionReceipt ${avg/block.transactions.length} ms, total txs ${block.transactions.length}, total block parse time ${new Date().getTime() - blockStartTime} ms`);
+      
+    return {
+      hash: data.hash,
+      prev_hash: data.parentHash,
+      height,
+      timestamp: new Date(+data.timestamp * 1000),
+      txs: data.transactions
+    }
+  }
+
   async _processBlock(i) {
     this.log("info", `start processing block ${i}`);
 
-    let block = await this.provider.getBlock(i);
+    let block = await this._getBlock(i);
 
     let processedBlock = {
       height: block.height,
