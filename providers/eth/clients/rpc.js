@@ -5,8 +5,6 @@ const formatters = require('web3-core-helpers').formatters;
 const util = require('util');
 const BigNumber = require('bignumber.js');
 
-const PLAIN_GAS = "0x5208";
-
 module.exports = class EthereumRpc {
 
   constructor({url}) {
@@ -53,14 +51,7 @@ module.exports = class EthereumRpc {
       let data = formatters.outputBlockFormatter(block);
 
       await Promise.all(data.transactions.map(async tx => {        
-        if (tx.gas == PLAIN_GAS) {
-          tx.receipt= {
-            gasUsed: PLAIN_GAS
-          };
-        } else {
-          tx.receipt = await this.cmd('eth_getTransactionReceipt', tx.hash);
-        }
-
+        tx.receipt = await this.cmd('eth_getTransactionReceipt', tx.hash);
         tx.gasPrice = (new BigNumber(tx.gasPrice)).toString(10);
         tx.value = (new BigNumber(tx.value)).toString(10);
         tx.timestamp = data.timestamp;
