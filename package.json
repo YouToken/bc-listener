@@ -22,7 +22,7 @@
     "eosjs": "^21.0.4",
     "lodash": "^4.17.21",
     "moment": "^2.29.1",
-    "node-fetch": "^2.6.1",
+    "node-fetch": "^3.1.1",
     "p-queue": "^6.6.2",
     "ripple-lib": "^1.9.4",
     "stellar-sdk": "^8.3.0",
